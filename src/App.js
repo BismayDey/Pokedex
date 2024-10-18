@@ -1,25 +1,55 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Pokedex from "./components/Pokedex";
+import PokemonDetail from "./components/PokemonDetail";
+import axios from "axios";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const [pokemons, setPokemons] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPokemons = async () => {
+      try {
+        const response = await axios.get(
+          "https://pokeapi.co/api/v2/pokemon?limit=151"
+        );
+        const results = await Promise.all(
+          response.data.results.map(async (pokemon) => {
+            const pokemonData = await axios.get(pokemon.url);
+            return pokemonData.data;
+          })
+        );
+        setPokemons(results);
+      } catch (error) {
+        console.error("Error fetching the Pokémon data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPokemons();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="app">
+        <h1>Pokedex</h1>
+        {loading ? (
+          <h2>Loading...</h2>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Pokedex pokemons={pokemons} />} />
+            <Route
+              path="/pokemon/:id"
+              element={<PokemonDetail pokemons={pokemons} />}
+            />
+          </Routes>
+        )}
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
