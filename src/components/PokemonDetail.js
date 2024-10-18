@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import "./PokemonDetail.css"; // Assuming you have a separate CSS file for styling
+import "../App.css"; // Assuming you have a separate CSS file for styling
 
 const PokemonDetail = ({ pokemons }) => {
   const { id } = useParams();
